@@ -1,1 +1,39 @@
 
+name: Build yili Kernel
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 300
+    steps:
+      - name: Checkout kernel source
+        run: |
+          git clone --depth=1 -b yili-w-oss https://github.com/MiCode/Xiaomi_Kernel_OpenSource.git kernel
+          cd kernel
+          git log -1 --oneline
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y bc bison build-essential flex libssl-dev libelf-dev \
+            zip rsync python3 git curl cpio kmod
+
+      - name: Fetch clang toolchain
+        run: |
+          mkdir -p $HOME/toolchain && cd $HOME/toolchain
+          curl -L -o clang.tar.gz https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+archive/refs/heads/main/clang-r536225.tar.gz || true
+          tar -xzf clang.tar.gz || true
+
+      - name: Build kernel
+        run: |
+          echo "NOTE: build steps are a placeholder skeleton."
+          ls -la kernel | head
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: yili-build-log
+          path: kernel/README* || true
